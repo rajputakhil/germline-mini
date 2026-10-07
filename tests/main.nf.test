@@ -1,0 +1,18 @@
+nextflow_pipeline {
+    name "End-to-end wiring: FASTQ to hap.py summary"
+    script "main.nf"
+    options "-stub"
+
+    test("produces a benchmark summary with SNP and INDEL rows") {
+        when {
+            params { outdir = "$outputDir" }
+        }
+        then {
+            assert workflow.success
+            def summary = path("${outputDir}/benchmark/HG002.summary.csv").readLines()
+            assert summary[0].startsWith('Type,Filter')
+            assert summary.any { it.startsWith('SNP,PASS') }
+            assert summary.any { it.startsWith('INDEL,PASS') }
+        }
+    }
+}

@@ -1,0 +1,22 @@
+nextflow_process {
+    name "FASTP trims a paired-end sample"
+    script "modules/fastp.nf"
+    process "FASTP"
+    options "-stub"          // drop once the fastp container and real test FASTQs are in place
+
+    test("emits trimmed reads and a JSON report") {
+        when {
+            process {
+                """
+                input[0] = tuple([id: 'HG002'], file("${projectDir}/tests/data/s1_R1.fq.gz"), file("${projectDir}/tests/data/s1_R2.fq.gz"))
+                """
+            }
+        }
+        then {
+            assert process.success
+            assert process.out.reads.size() == 1
+            assert process.out.reads[0][1].size() == 2           // R1 + R2
+            assert file(process.out.json[0]).name == 'HG002.fastp.json'
+        }
+    }
+}
