@@ -1,3 +1,6 @@
+![CI](https://github.com/rajputakhil/germline-mini/actions/workflows/ci.yml/badge.svg)
+
+
 # germline-mini — sprint starter kit
 
 A small Nextflow DSL2 pipeline (FASTQ → fastp → BWA-MEM2 → MarkDuplicates → DeepVariant → hap.py vs GIAB)
