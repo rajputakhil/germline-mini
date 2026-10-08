@@ -3,11 +3,12 @@ process BWA_MEM2 {
     cpus 8
     memory '16 GB'
     // needs bwa-mem2 + samtools; build a small image or use a mulled biocontainer
-    container 'your-registry/bwa-mem2-samtools:2.2.1'
+    container 'germline-mini/bwa-mem2-samtools:2.2.1'
 
     input:
     tuple val(meta), path(reads)
     path fasta
+    path index      // bwa-mem2 index files, staged next to the FASTA
 
     output:
     tuple val(meta), path("${meta.id}.sorted.bam"), emit: bam
