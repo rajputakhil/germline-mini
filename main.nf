@@ -28,11 +28,14 @@ workflow {
     def ref = channel.value(file(params.fasta))
 
     def bwa_index = channel.value(files("${params.fasta}.{0123,amb,ann,bwt.2bit.64,pac}"))
+    def fai = channel.value(file("${params.fasta}.fai"))   // DeepVariant needs the FASTA index staged too
     FASTP(reads)
     BWA_MEM2(FASTP.out.reads, ref, bwa_index)
     MARKDUP(BWA_MEM2.out.bam)
     if (!params.skip_calling) {          // --skip_calling: stop after MARKDUP (Week 1)
-        DEEPVARIANT(MARKDUP.out.bam, ref)
-        HAPPY(DEEPVARIANT.out.vcf, ref, file(params.truth_vcf), file(params.truth_bed))
+        DEEPVARIANT(MARKDUP.out.bam, ref, fai)
+        if (!params.skip_benchmark) {     // --skip_benchmark: stop after DeepVariant
+            HAPPY(DEEPVARIANT.out.vcf, ref, file(params.truth_vcf), file(params.truth_bed))
+        }
     }
 }

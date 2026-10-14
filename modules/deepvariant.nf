@@ -7,7 +7,8 @@ process DEEPVARIANT {
 
     input:
     tuple val(meta), path(bam), path(bai)
-    path fasta   // .fai must sit next to the FASTA
+    path fasta
+    path fai     // chr20.fa.fai, staged next to the FASTA
 
     output:
     tuple val(meta), path("${meta.id}.dv.vcf.gz"), path("${meta.id}.dv.vcf.gz.tbi"), emit: vcf
@@ -15,7 +16,7 @@ process DEEPVARIANT {
     script:
     """
     /opt/deepvariant/bin/run_deepvariant \\
-      --model_type=WES \\
+      --model_type=${params.dv_model} \\
       --ref=${fasta} --reads=${bam} \\
       --regions=${params.regions} \\
       --output_vcf=${meta.id}.dv.vcf.gz \\
