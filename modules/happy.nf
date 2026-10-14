@@ -1,12 +1,14 @@
 process HAPPY {
     tag "${meta.id}"
-    container 'pkrusche/hap.py:latest'
+    container 'quay.io/biocontainers/hap.py:0.3.15--py27hcb73b3d_0'
     publishDir "${params.outdir}/benchmark", mode: 'copy'
 
     input:
     tuple val(meta), path(vcf), path(tbi)
     path fasta
+    path fai          // chr20.fa.fai
     path truth_vcf
+    path truth_tbi    // index for the truth VCF
     path truth_bed
 
     output:
@@ -15,9 +17,9 @@ process HAPPY {
 
     script:
     """
-    /opt/hap.py/bin/hap.py ${truth_vcf} ${vcf} \\
-      -f ${truth_bed} -r ${fasta} -l ${params.regions} \\
-      --engine=vcfeval -o ${meta.id}
+    hap.py ${truth_vcf} ${vcf} \\
+      -f ${truth_bed} -r ${fasta} \\
+      --threads ${task.cpus} -o ${meta.id}
     """
 
     stub:
